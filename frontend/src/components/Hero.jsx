@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
+import FeatureCard from "./FeatureCard";
 
 function Hero() {
   return (
@@ -49,6 +50,53 @@ function Hero() {
 
         </div>
       </motion.div>
+      <div className="flex flex-wrap justify-center gap-4 mt-12">
+
+  <div className="bg-slate-900/70 border border-slate-700 px-5 py-2 rounded-full">
+    Amazon
+  </div>
+
+  <div className="bg-slate-900/70 border border-slate-700 px-5 py-2 rounded-full">
+    Flipkart
+  </div>
+
+  <div className="bg-slate-900/70 border border-slate-700 px-5 py-2 rounded-full">
+    Croma
+  </div>
+
+  <div className="bg-slate-900/70 border border-slate-700 px-5 py-2 rounded-full">
+    Reliance Digital
+  </div>
+
+</div>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-24 w-full max-w-6xl">
+
+        <FeatureCard
+          icon="📈"
+          title="Price Tracking"
+          description="Track price changes across stores."
+        />
+
+        <FeatureCard
+          icon="🤖"
+          title="AI Reviews"
+          description="Summarize thousands of reviews instantly."
+        />
+
+        <FeatureCard
+          icon="🔔"
+          title="Price Alerts"
+          description="Get notified when prices drop."
+        />
+
+        <FeatureCard
+          icon="❤️"
+          title="Wishlist"
+          description="Save products and monitor them."
+        />
+
+      </div>
 
     </section>
   );
