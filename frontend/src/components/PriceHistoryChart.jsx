@@ -7,14 +7,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-function PriceHistoryChart() {
-  const data = [
-    { month: "Jan", price: 80000 },
-    { month: "Feb", price: 78000 },
-    { month: "Mar", price: 76000 },
-    { month: "Apr", price: 74499 },
-  ];
-
+function PriceHistoryChart({ data }) {
   return (
     <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">

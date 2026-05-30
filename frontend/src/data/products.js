@@ -18,6 +18,13 @@ const products = [
     rating: "4.8",
     delivery: "Tomorrow",
 
+    priceHistory: [
+      { month: "Jan", price: 80000 },
+      { month: "Feb", price: 78000 },
+      { month: "Mar", price: 76000 },
+      { month: "Apr", price: 74499 },
+    ],
+
     reviewSummary:
       "Users love the display quality, battery life, and performance. Most complaints are about the camera price-to-value ratio.",
   },
@@ -41,6 +48,13 @@ const products = [
     rating: "4.9",
     delivery: "2 Days",
 
+    priceHistory: [
+      { month: "Jan", price: 135000 },
+      { month: "Feb", price: 132000 },
+      { month: "Mar", price: 128000 },
+      { month: "Apr", price: 124999 },
+    ],
+
     reviewSummary:
       "Users praise the battery life, display, and performance. Some users feel the upgrade over previous generations is incremental.",
   },
@@ -63,6 +77,13 @@ const products = [
 
     rating: "4.7",
     delivery: "Tomorrow",
+
+    priceHistory: [
+      { month: "Jan", price: 98000 },
+      { month: "Feb", price: 95000 },
+      { month: "Mar", price: 92000 },
+      { month: "Apr", price: 89999 },
+    ],
 
     reviewSummary:
       "Users appreciate the camera system, display, and S-Pen features. Some report the device feels bulky.",

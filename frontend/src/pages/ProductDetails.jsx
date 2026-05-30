@@ -141,7 +141,9 @@ function ProductDetails() {
             📈 Price History
           </h2>
 
-          <PriceHistoryChart />
+          <PriceHistoryChart
+          data={product.priceHistory}
+          />
 
         </div>
 
