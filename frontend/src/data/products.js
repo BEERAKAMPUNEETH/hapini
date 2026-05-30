@@ -9,6 +9,10 @@ const products = [
     flipkart: "₹74,499",
     croma: "₹76,199",
 
+    amazonLink: "https://www.amazon.in",
+    flipkartLink: "https://www.flipkart.com",
+    cromaLink: "https://www.croma.com",
+
     bestDeal: "Flipkart",
 
     rating: "4.8",
@@ -28,6 +32,10 @@ const products = [
     flipkart: "₹1,26,999",
     croma: "₹1,25,999",
 
+    amazonLink: "https://www.amazon.in",
+    flipkartLink: "https://www.flipkart.com",
+    cromaLink: "https://www.croma.com",
+
     bestDeal: "Amazon",
 
     rating: "4.9",
@@ -46,6 +54,10 @@ const products = [
     amazon: "₹90,999",
     flipkart: "₹89,999",
     croma: "₹91,499",
+
+    amazonLink: "https://www.amazon.in",
+    flipkartLink: "https://www.flipkart.com",
+    cromaLink: "https://www.croma.com",
 
     bestDeal: "Flipkart",
 
