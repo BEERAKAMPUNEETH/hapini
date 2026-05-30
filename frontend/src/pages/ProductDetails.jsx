@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import products from "../data/products";
+import PriceHistoryChart from "../components/PriceHistoryChart";
 
 function ProductDetails() {
   const { id } = useParams();
@@ -140,12 +141,7 @@ function ProductDetails() {
             📈 Price History
           </h2>
 
-          <div className="space-y-2 text-slate-400">
-            <p>January - ₹80,000</p>
-            <p>February - ₹78,000</p>
-            <p>March - ₹76,000</p>
-            <p>April - ₹74,499</p>
-          </div>
+          <PriceHistoryChart />
 
         </div>
 
