@@ -50,6 +50,13 @@ export const productRepository = {
       orderSql = "ORDER BY p.rating DESC";
     }
 
+    const safeLimit = Math.max(1, Math.min(100, Number(options.limit) || 50));
+    const safeOffset = Math.max(0, Number(options.offset) || 0);
+    params.push(safeLimit);
+    const limitPlaceholder = `$${params.length}`;
+    params.push(safeOffset);
+    const offsetPlaceholder = `$${params.length}`;
+
     const sql = `
       SELECT 
         p.id,
@@ -92,7 +99,7 @@ export const productRepository = {
       ${whereSql}
       GROUP BY p.id
       ${orderSql}
-      LIMIT ${options.limit || 50} OFFSET ${options.offset || 0};
+      LIMIT ${limitPlaceholder} OFFSET ${offsetPlaceholder};
     `;
 
     const res = await query(sql, params);
