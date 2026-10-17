@@ -18,6 +18,23 @@ function ProductDetails() {
       </div>
     );
   }
+  const stores = [
+  { name: "Amazon", price: product.amazon },
+  { name: "Flipkart", price: product.flipkart },
+  { name: "Croma", price: product.croma },
+];
+
+const cheapestStore = stores.reduce((min, store) => {
+  const minPrice = Number(
+    min.price.replace(/[₹,]/g, "")
+  );
+
+  const storePrice = Number(
+    store.price.replace(/[₹,]/g, "")
+  );
+
+  return storePrice < minPrice ? store : min;
+});
 
   return (
     <div className="min-h-screen bg-slate-950 text-white p-10">
@@ -62,7 +79,9 @@ function ProductDetails() {
               </p>
 
               <p className="text-2xl text-green-400 font-semibold">
-                🏆 Best Deal: {product.bestDeal}
+                <p className="text-2xl text-green-400 font-semibold">
+                  🏆 Best Deal: {cheapestStore.name}
+                  </p>
               </p>
 
             </div>

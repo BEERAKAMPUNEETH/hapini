@@ -1,0 +1,45 @@
+{
+  "name": "hapini-backend",
+  "version": "1.0.0",
+  "description": "Hapini Backend API - Node.js, Express, TypeScript, PostgreSQL & Redis",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "test": "tsx src/tests/run_all.ts",
+    "test:unit": "tsx src/tests/unit/pricing_and_alerts.unit.test.ts",
+    "test:integration": "tsx src/tests/integration/api_isolated_db.test.ts",
+    "test:auth": "tsx src/tests/auth_and_wishlist.test.ts",
+    "test:cache": "tsx src/tests/redis_cache.test.ts",
+    "test:alerts": "tsx src/tests/price_alerts.test.ts",
+    "clean": "rimraf dist",
+    "db:create": "tsx src/database/createDatabases.ts",
+    "db:migrate": "tsx src/database/migrator.ts",
+    "db:seed": "tsx src/database/seeder.ts",
+    "db:setup": "tsx src/database/createDatabases.ts && tsx src/database/migrator.ts && tsx src/database/seeder.ts"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.7.1",
+    "ioredis": "^5.5.0",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.13.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^22.13.0",
+    "@types/pg": "^8.11.11",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

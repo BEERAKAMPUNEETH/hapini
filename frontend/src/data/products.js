@@ -13,8 +13,6 @@ const products = [
     flipkartLink: "https://www.flipkart.com",
     cromaLink: "https://www.croma.com",
 
-    bestDeal: "Flipkart",
-
     rating: "4.8",
     delivery: "Tomorrow",
 
@@ -43,8 +41,6 @@ const products = [
     flipkartLink: "https://www.flipkart.com",
     cromaLink: "https://www.croma.com",
 
-    bestDeal: "Amazon",
-
     rating: "4.9",
     delivery: "2 Days",
 
@@ -72,8 +68,6 @@ const products = [
     amazonLink: "https://www.amazon.in",
     flipkartLink: "https://www.flipkart.com",
     cromaLink: "https://www.croma.com",
-
-    bestDeal: "Flipkart",
 
     rating: "4.7",
     delivery: "Tomorrow",

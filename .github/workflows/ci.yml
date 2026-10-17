@@ -1,0 +1,129 @@
+name: Hapini CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+# Least-privilege permissions: only allow reading repository contents
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend (Lint, Typecheck, Tests & Build)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Typecheck Frontend
+        working-directory: ./frontend
+        run: npm run typecheck
+
+      - name: Run Frontend Tests (Vitest)
+        working-directory: ./frontend
+        run: npm test
+
+      - name: Build Production Frontend Bundle
+        working-directory: ./frontend
+        run: npm run build
+
+  backend:
+    name: Backend (Lint, Typecheck, DB Integration & Tests)
+    runs-on: ubuntu-latest
+
+    # Isolated service containers for realistic integration testing in CI
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres_ci_password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      PORT: 5000
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres_ci_password
+      DB_NAME: hapini_dev
+      TEST_DB_NAME: hapini_test
+      DATABASE_URL: postgresql://postgres:postgres_ci_password@localhost:5432/hapini_dev
+      TEST_DATABASE_URL: postgresql://postgres:postgres_ci_password@localhost:5432/hapini_test
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: hapini_ci_test_jwt_secret_key_minimum_32_characters_random
+      JWT_EXPIRES_IN: 7d
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Typecheck Backend (TypeScript)
+        working-directory: ./backend
+        run: npm run typecheck
+
+      - name: Initialize PostgreSQL Dev & Test Databases
+        working-directory: ./backend
+        run: npm run db:setup
+
+      - name: Run Backend Tests (Unit, Auth, Redis Cache, Alerts & Isolated DB)
+        working-directory: ./backend
+        run: npm test
+
+      - name: Build Backend Production Code
+        working-directory: ./backend
+        run: npm run build
