@@ -1,0 +1,141 @@
+name: Hapini Production Deployment (AWS)
+
+# ==============================================================================
+# Manual Workflow Dispatch - Will NEVER run automatically without user approval!
+# ==============================================================================
+on:
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: "Deployment Environment Target"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - production
+          - staging
+
+permissions:
+  id-token: write # Required for AWS OIDC authentication (no long-lived secret keys!)
+  contents: read
+
+concurrency:
+  group: aws-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # ----------------------------------------------------------------------------
+  # 1. Verification Gate: Ensure all tests and typechecks pass before deployment
+  # ----------------------------------------------------------------------------
+  verify:
+    name: Verify Code Quality & Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Run Backend Tests
+        working-directory: ./backend
+        run: |
+          npm ci
+          npm run typecheck
+          npm test
+
+  # ----------------------------------------------------------------------------
+  # 2. Backend Deployment: Build Docker Image, Push to ECR, Rollout ECS Service
+  # ----------------------------------------------------------------------------
+  deploy-backend:
+    name: Build & Deploy Backend (ECR + ECS Fargate)
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC - No Long-Lived Keys!)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+          role-session-name: HapiniGitHubDeploySession
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, Tag, and Push Backend Image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY || 'hapini-backend' }}
+          IMAGE_TAG: ${{ github.sha }}
+        working-directory: ./backend
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Deploy to Amazon ECS Fargate
+        env:
+          CLUSTER_NAME: ${{ vars.ECS_CLUSTER_NAME || 'hapini-cluster-production' }}
+          SERVICE_NAME: ${{ vars.ECS_SERVICE_NAME || 'hapini-service-production' }}
+        run: |
+          echo "Triggering zero-downtime rolling update on ECS Fargate..."
+          aws ecs update-service \
+            --cluster $CLUSTER_NAME \
+            --service $SERVICE_NAME \
+            --force-new-deployment
+
+  # ----------------------------------------------------------------------------
+  # 3. Frontend Deployment: Build SPA Bundle, Sync to S3, Invalidate CloudFront
+  # ----------------------------------------------------------------------------
+  deploy-frontend:
+    name: Build & Deploy Frontend (S3 + CloudFront)
+    needs: deploy-backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+          role-session-name: HapiniFrontendDeploySession
+
+      - name: Install & Build Frontend SPA
+        working-directory: ./frontend
+        env:
+          # In CloudFront, /api/* routes directly to the backend ALB
+          VITE_API_URL: /api
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy to Amazon S3
+        env:
+          S3_BUCKET: ${{ vars.FRONTEND_S3_BUCKET }}
+        run: |
+          aws s3 sync frontend/dist s3://$S3_BUCKET --delete
+
+      - name: Invalidate Amazon CloudFront Cache
+        env:
+          DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id $DISTRIBUTION_ID \
+            --paths "/*"

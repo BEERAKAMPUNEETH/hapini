@@ -6,6 +6,7 @@ export const pool = new Pool({
   connectionTimeoutMillis: 3000,
   idleTimeoutMillis: 10000,
   max: 10,
+  ssl: env.DB_SSL ? { rejectUnauthorized: false } : undefined,
 });
 
 let isConnected = false;

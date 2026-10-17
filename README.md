@@ -343,6 +343,23 @@ To enforce branch protection and ensure code quality before merging PRs:
 
 ---
 
+## ☁️ AWS Cloud Production Architecture
+
+Hapini includes production-ready AWS deployment templates and configurations prepared for secure, cost-conscious cloud hosting:
+
+- **Architecture:** Unified Amazon CloudFront distribution serving static React SPA assets from Amazon S3 and routing dynamic `/api/*` endpoints to containerized Node.js API tasks (ECS Fargate / App Runner), backed by Amazon RDS PostgreSQL 16.
+- **Cost Minimization:** Eliminates AWS NAT Gateways (~$32/mo saved), uses standard SSM Parameter Store (100% free), leverages AWS Free Tier (`db.t4g.micro`, 1 TB CloudFront bandwidth), and supports built-in in-memory caching fallback ($0/mo). Total estimated cost: **~$9 – $25 / month**.
+- **Security:** OIDC federated authentication for GitHub Actions (no long-lived AWS secret keys), IAM least-privilege policies, SSM `SecureString` secrets, and automatic HTTPS with ACM.
+- **Reference & Configurations:**
+  - Complete Step-by-Step Guide: [`docs/AWS_DEPLOYMENT_GUIDE.md`](file:///docs/AWS_DEPLOYMENT_GUIDE.md)
+  - Infrastructure-as-Code Stack: [`aws/cloudformation.yml`](file:///aws/cloudformation.yml)
+  - ECS Fargate Task Definition: [`aws/ecs-task-definition.json`](file:///aws/ecs-task-definition.json)
+  - App Runner Specification: [`aws/apprunner.yaml`](file:///aws/apprunner.yaml)
+  - Production Environment Template: [`.env.production.example`](file:///.env.production.example)
+  - GitHub Actions Deployment Workflow: [`.github/workflows/deploy.yml`](file:///.github/workflows/deploy.yml) *(Manual dispatch only — never auto-deploys without approval)*
+
+---
+
 ## 💡 Key SDE Interview Talking Points
 
 1. **Cache-Aside Pattern & Consistency:** The database remains the authoritative source of truth. Redis acts as a pure read-through accelerator. When product prices or offers update, the corresponding detail and list keys are evicted to prevent presenting stale prices.

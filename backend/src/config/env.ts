@@ -24,6 +24,7 @@ export const env = {
   TEST_DB_NAME: testDbName,
   DB_USER: dbUser,
   DB_PASSWORD: dbPassword,
+  DB_SSL: process.env.DB_SSL === "true",
   DATABASE_URL:
     process.env.DATABASE_URL ||
     `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`,

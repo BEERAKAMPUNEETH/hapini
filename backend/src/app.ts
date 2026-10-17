@@ -11,9 +11,21 @@ import { requestLogger } from "./middleware/logger";
 
 export const app: Application = express();
 
+// Parse comma-separated allowed origins for production + localhost for dev
+const clientOrigins = env.CLIENT_URL.split(",").map((url) => url.trim());
+const allowedOrigins = Array.from(
+  new Set([
+    ...clientOrigins,
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:80",
+    "http://localhost",
+  ])
+);
+
 // Standard middleware
 app.use(cors({
-  origin: [env.CLIENT_URL, "http://localhost:5173", "http://127.0.0.1:5173"],
+  origin: allowedOrigins,
   credentials: true,
 }));
 app.use(express.json());
