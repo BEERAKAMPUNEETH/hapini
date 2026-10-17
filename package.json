@@ -22,6 +22,7 @@
     "test:auth": "npm --prefix backend run test:auth",
     "test:cache": "npm --prefix backend run test:cache",
     "test:alerts": "npm --prefix backend run test:alerts",
+    "test:persistence": "npm --prefix backend run test:persistence",
     "build": "npm run build:frontend && npm run build:backend",
     "db:create": "npm --prefix backend run db:create",
     "db:migrate": "npm --prefix backend run db:migrate",

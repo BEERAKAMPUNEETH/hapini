@@ -15,6 +15,7 @@
     "test:auth": "tsx src/tests/auth_and_wishlist.test.ts",
     "test:cache": "tsx src/tests/redis_cache.test.ts",
     "test:alerts": "tsx src/tests/price_alerts.test.ts",
+    "test:persistence": "tsx src/tests/unit/database_connection_and_persistence.test.ts",
     "clean": "rimraf dist",
     "db:create": "tsx src/database/createDatabases.ts",
     "db:migrate": "tsx src/database/migrator.ts",

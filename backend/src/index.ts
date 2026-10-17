@@ -10,20 +10,24 @@ async function bootstrap() {
   console.log(` Starting Hapini Backend Server in ${env.NODE_ENV} mode...`);
 
   // Check database connectivity and auto-sync schema if connected
-  checkDatabaseConnection()
-    .then(async (connected) => {
-      if (connected) {
-        try {
-          await runMigrations();
-          await runSeeds();
-        } catch (dbErr: any) {
-          console.warn("⚠️ Database auto-migration notice:", dbErr.message);
-        }
-      }
-    })
-    .catch((err) => {
-      console.warn("⚠️ Initial database check warning:", err.message);
-    });
+  const connected = await checkDatabaseConnection().catch((err) => {
+    console.warn("⚠️ Initial database check warning:", err.message);
+    return false;
+  });
+
+  if (!connected && env.DB_REQUIRED) {
+    console.error(`❌ FATAL: Database connection failed and DB_REQUIRED=true. Halting server startup (PostgreSQL persistence required).`);
+    process.exit(1);
+  }
+
+  if (connected) {
+    try {
+      await runMigrations();
+      await runSeeds();
+    } catch (dbErr: any) {
+      console.warn("⚠️ Database auto-migration notice:", dbErr.message);
+    }
+  }
 
   const server = app.listen(env.PORT, () => {
     console.log(` Hapini Backend Server running on http://localhost:${env.PORT}`);

@@ -40,6 +40,9 @@ async function main() {
     console.log("\n>> SUITE 5: API Integration Tests with Isolated Test DB\n");
     await runScript("src/tests/integration/api_isolated_db.test.ts");
 
+    console.log("\n>> SUITE 6: Database Persistence & Connection Tests\n");
+    await runScript("src/tests/unit/database_connection_and_persistence.test.ts");
+
     console.log("\n==================================================");
     console.log("    ALL HAPINI TEST SUITES PASSED CLEANLY!       ");
     console.log("==================================================");
