@@ -11,7 +11,7 @@ Hapini monitors, aggregates, and compares prices for consumer tech across major 
 ```
                       ┌──────────────────────────────────────┐
                       │          React 19 + TypeScript       │
-                      │   Vite 8 + Tailwind CSS v4 + Mol*    │
+                      │  Vite 8 + Tailwind CSS v4 + Recharts │
                       └──────────────────┬───────────────────┘
                                          │ REST API / JWT
                       ┌──────────────────▼───────────────────┐
